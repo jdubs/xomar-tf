@@ -20,29 +20,27 @@ resource "aws_s3_bucket_website_configuration" "website" {
   }
 }
 
-# S3 Public Access Block (CloudFront will handle permissions)
 resource "aws_s3_bucket_public_access_block" "website" {
   bucket = aws_s3_bucket.website.id
 
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
 }
 
-# Bucket Policy for CloudFront Access
-resource "aws_s3_bucket_policy" "website" {
-  bucket = aws_s3_bucket.website.id
+resource "aws_s3_bucket_policy" "xomar_public_read" {
+  bucket = aws_s3_bucket.website.id  # Ensure this matches your S3 bucket resource
+
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version = "2012-10-17",
     Statement = [
       {
-        Effect = "Allow"
-        Principal = {
-          Service = "cloudfront.amazonaws.com"
-        }
-        Action   = "s3:GetObject"
-        Resource = "${aws_s3_bucket.website.arn}/*"
+        Sid       = "PublicReadGetObject",
+        Effect    = "Allow",
+        Principal = "*",
+        Action    = "s3:GetObject",
+        Resource  = "arn:aws:s3:::${var.domain_name}/*"
       }
     ]
   })

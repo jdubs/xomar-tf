@@ -8,6 +8,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   is_ipv6_enabled = true
 
   aliases = concat([var.domain_name], [for sub in var.subdomains : "${sub}.${var.domain_name}"])
+  default_root_object = "index.html"
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD"]
